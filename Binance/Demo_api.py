@@ -4,7 +4,6 @@ import os
 from binance.client import Client
 import requests
 import json
-import websocket
 
 load_dotenv() # read file from local .env
 

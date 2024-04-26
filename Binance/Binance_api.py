@@ -1,10 +1,7 @@
-import pandas as pd
 from dotenv import load_dotenv
 from binance.client import Client
-import requests
 import os
 import json
-import websocket
 from websocket import WebSocketApp
 from datetime import datetime
 
@@ -18,7 +15,6 @@ class BinanceTrade:
     def __init__(self, symbol):
         self.symbol = symbol.lower()
         self.trade_socket = f'wss://stream.binance.com:9443/ws/{self.symbol}@trade'
-        self.kline_socket = f'wss://nbstream.binance.com/eoptions/ws/{self.symbol}@kline_1m'
         self.ws = None
 
     def on_message(self, ws, message):
@@ -48,8 +44,3 @@ class BinanceTrade:
                                on_error=self.on_error,
                                on_close=self.on_close)
         self.ws.run_forever()
-
-if __name__ == '__main__':
-    symbol = 'btcusdt'  # Example symbol, can be replaced with any other
-    ws_client = BinanceTrade(symbol)
-    ws_client.run()
