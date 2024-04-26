@@ -13,15 +13,15 @@ API = os.getenv('TRADINGVIEW_API')
 tv = TvDatafeed(USERNAME, PASSWORD)
 fmp = FMP(api_key=API)
 
-class PreviousData:
+class TradingViewDataFeed:
 
     def __init__(self, symbol, exchange):
         self._symbol = symbol
         self._exchange = exchange
 
 
-    def retrieve_data_inMonth(self):
+    def get_historical_peak(self) -> float:
         btc_data = tv.get_hist(symbol=self._symbol,exchange=self._exchange,interval=Interval.in_monthly,n_bars=1000)
 
-        previous_peak_high = max(btc_data['high'])
+        previous_peak_high = max(map(float, btc_data['high']))
         return previous_peak_high

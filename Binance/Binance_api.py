@@ -4,6 +4,7 @@ import os
 import json
 from websocket import WebSocketApp
 from datetime import datetime
+from TradingView.TradingViewDataFeed import TradingViewDataFeed
 
 load_dotenv()
 
@@ -16,17 +17,23 @@ class BinanceTrade:
         self.symbol = symbol.lower()
         self.trade_socket = f'wss://stream.binance.com:9443/ws/{self.symbol}@trade'
         self.ws = None
+        self.curr_mkt_price = 0.0
+        self.trading_view_data_feed = TradingViewDataFeed(symbol.upper(), 'BINANCE')
+        self.historical_peak = self.trading_view_data_feed.get_historical_peak()
 
     def on_message(self, ws, message):
         json_message = json.loads(message)
         curr_event_time = json_message['E'] / 1000
         event_time = datetime.utcfromtimestamp(curr_event_time)
 
-        curr_mkt_price = json_message['p']
-        print(f'Market Price: {curr_mkt_price} -- {event_time}')
+        self.curr_mkt_price = float(json_message['p'])
 
-    def comparePrice():
-        pass
+
+        if self.compareHighestPeak():
+            print("CAUTION!!!")
+            self.historical_peak = self.curr_mkt_price
+        else:
+            print(f'Market Price: {self.curr_mkt_price} -- {event_time}')
 
     def on_error(self, ws, error):
         print("Error encountered:", error)
@@ -36,6 +43,9 @@ class BinanceTrade:
 
     def on_open(self, ws):
         print("Opened Connection")
+
+    def compareHighestPeak(self) -> bool:
+        return self.historical_peak < self.curr_mkt_price
 
     def run(self):
         self.ws = WebSocketApp(self.trade_socket,
