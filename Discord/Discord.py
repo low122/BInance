@@ -27,11 +27,13 @@ async def on_message(message: discord.Message):
     if message.author == client.user:
         return
     
-    if "usdt" in SYMBOL.lower():
+    if "usdt" in SYMBOL:
         if SYMBOL.endswith('usdt'):
-            bt = BinanceTrade(SYMBOL)
+            bt = BinanceTrade(SYMBOL.upper())
+            bt.run()
             embed = discord.Embed(title='Peak Notification (USDT)', description='track peak', color=0x00ff00)
-            embed.add_field(name=SYMBOL, value=f'${bt.curr_mkt_price}', inline=True)
+            embed.add_field(name=SYMBOL.upper(), value=f'${bt.curr_mkt_price}', inline=False)
+            embed.add_field(name='Time(UTC): ', value=f'{bt.getEventTime()}', inline=False)
             await message.channel.send(embed=embed)
     else:
         await message.channel.send('Only USDT available for current version')
