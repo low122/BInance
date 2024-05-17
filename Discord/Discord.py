@@ -22,6 +22,8 @@ async def on_ready():
 user_states = {}
 user_symbol = {}
 user_content = {}
+user_trades = {}
+
 
 def get_user_state(user_id):
     return user_states.get(user_id)
@@ -40,6 +42,13 @@ def get_user_content(user_id):
 
 def set_user_specific_price(user_id, content):
     user_content[user_id] = content
+
+def get_user_trade(user_id):
+    return user_trades.get(user_id)
+
+def set_user_trade(user_id, trade_instance):
+    user_trades[user_id] = trade_instance
+
 
 async def mainBoard(message):
     generalInfo = discord.Embed(title='Binance Track')
@@ -61,13 +70,21 @@ async def on_message(message: discord.Message):
 
     if message.content.upper().endswith('USDT') and current_state is None:
         set_user_symbol(message.author.id, message.content.upper())
+        if not get_user_trade(message.author.id):
+            new_trade = BinanceTrade(message.content.upper())
+            set_user_trade(message.author.id, new_trade)
+            new_trade.start()
         await mainBoard(message=message)
     elif current_state == 'awaiting selection':
-        bt = BinanceTrade(user_symbol)
-        bt.run()
+        bt = get_user_trade(message.author.id)
+        if bt:
+            bt.start()
+        await message.channel.send(f"Tracking {user_symbol}....")
+
         if bt.curr_mkt_price is None:
             await message.channel.send("Failed to retrieve data.")
             return
+        
         if message.content == "1":
             # Chekcing if the dictionary is not empty
             if user_symbol:
@@ -94,15 +111,15 @@ async def on_message(message: discord.Message):
         else:
             await message.channel.send('Invalid Choice')
     elif current_state == 'awaiting specific price':
-        bt = BinanceTrade(user_symbol)
-        bt.run()
+        bt = get_user_trade(message.author.id)
+        bt.start()
         try:
             specific_price = float(message.content)  # Convert input to float
             set_user_specific_price(message.author.id, specific_price)
             await message.channel.send(f"Tracking price set to ${specific_price}.\nCurrent market price ${bt.curr_mkt_price}")
             if bt.note_specific_price(specific_price):
                 await message.channel.send(f'Alert!!!! The price has reached ${specific_price}')
-            set_user_state(message.author.id, None)  # Reset state after handling
+            set_user_state(message.author.id, "awaiting selection")
         except ValueError:
             await message.channel.send("Please enter a valid price.")
     else:
