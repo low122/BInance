@@ -49,7 +49,6 @@ def get_user_trade(user_id):
 def set_user_trade(user_id, trade_instance):
     user_trades[user_id] = trade_instance
 
-
 async def mainBoard(message):
     generalInfo = discord.Embed(title='Binance Track')
     generalInfo.add_field(name='!1', value='- General Information', inline=False)
@@ -109,7 +108,7 @@ async def on_message(message: discord.Message):
         elif message.content == "!2":
             if user_symbol:
                 trackPeak = discord.Embed(title='Track Highest Peak', description='---BEGIN---', color=0x00ff00)
-                trackPeak.add_field(name='Current Highest Peak (Price): ', value=f'${bt.getHistoricalPeak()}', inline=False)
+                trackPeak.add_field(name='Historical Peak (Price): ', value=f'${bt.getHistoricalPeak()}', inline=False)
                 await message.channel.send(embed=trackPeak)
 
                 if bt.note_highest_peak():

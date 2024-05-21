@@ -46,7 +46,7 @@ class BinanceTrade:
         return self.historical_peak < self.curr_mkt_price
 
     def note_specific_price(self, specificPrice):
-        return specificPrice <= self.curr_mkt_price
+        return specificPrice == self.curr_mkt_price
     
     def getEventTime(self):
         return self.event_time
