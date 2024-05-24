@@ -61,7 +61,7 @@ class Scan_api:
 
     async def get_volume(self, session, symbol):
         try:
-            klines = await self.fetch_klines(session, symbol, '1h', 2)
+            klines = await self.fetch_klines(session, symbol, '15m', 2)
             return float(klines[-1][5]), float(klines[-2][5])  # Last and second last volume
         except Exception as e:
             print(f'Error fetching volume for {symbol}: {e}')

@@ -37,9 +37,12 @@ async def on_message(message: discord.Message):
                 for result in scan.results_without_duplication:
                     if result not in latest_coins:
                         latest_coins.append(result)
-                        await message.channel.send(f'Coin {result} has increased 300% volume in the last hour')
+                        await message.channel.send(f'Coin {result} has increased 300% volume in the last 15min')
 
                 await asyncio.sleep(120)
+
+        if message.content.startswith('!stop'):
+            return
 
             # if scan.eligible_coin:
             #     await message.channel.send(f'Coin {scan.eligible_coin} has increased volume in the last hour')
